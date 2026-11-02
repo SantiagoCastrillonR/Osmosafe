@@ -1,0 +1,434 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSMO SAFE | Seguridad farmacológica</title>
+<style>
+:root{
+  --navy:#17324d;
+  --teal:#168b8a;
+  --teal-dark:#106b6b;
+  --cream:#f7f4eb;
+  --orange:#f2a65a;
+  --ink:#263746;
+  --muted:#687985;
+  --white:#fff;
+  --green:#23845b;
+  --border:#dce5e3;
+  --shadow:0 12px 35px rgba(23,50,77,.12);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--cream);color:var(--ink)}
+button{font:inherit;cursor:pointer}
+.app{width:min(1050px,94%);margin:28px auto;background:#fff;border-radius:25px;overflow:hidden;box-shadow:var(--shadow);min-height:650px}
+header{background:var(--navy);color:#fff;padding:24px 30px;display:flex;justify-content:space-between;align-items:center;gap:15px}
+.brand{display:flex;align-items:center;gap:13px}
+.logo{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:var(--orange);color:var(--navy);font-size:25px;font-weight:900}
+.brand h1{margin:0;font-size:25px;letter-spacing:1px}
+.brand p{margin:4px 0 0;font-size:12px;color:#c7d7df}
+.header-tag{border:1px solid #547085;border-radius:30px;padding:8px 13px;font-size:12px;color:#e2edf1}
+main{padding:30px}
+.screen{display:none}
+.screen.active{display:block}
+.eyebrow{color:var(--teal-dark);font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:1.5px}
+h2{color:var(--navy);font-size:30px;margin:9px 0 12px}
+p{line-height:1.55}
+.intro{display:grid;grid-template-columns:1.15fr .85fr;gap:25px;align-items:center}
+.intro-card{background:#edf6f3;border-radius:20px;padding:25px}
+.character-large{min-height:220px;display:grid;place-items:center;background:#f9eee0;border-radius:20px}
+.character-large svg{width:190px;height:190px}
+.primary{border:0;background:var(--teal);color:white;padding:14px 23px;border-radius:12px;font-weight:bold;margin-top:14px}
+.primary:hover{background:var(--teal-dark)}
+.rules{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.rule{background:#fff;border:1px solid var(--border);padding:15px;border-radius:14px;font-size:13px}
+.rule strong{display:block;color:var(--teal-dark);margin-bottom:5px}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}
+.progress-wrap{height:9px;background:#e8efed;border-radius:20px;overflow:hidden;margin:12px 0 22px}
+.progress{height:100%;width:0;background:var(--orange);transition:width .3s ease}
+.counter{font-size:13px;color:var(--muted);font-weight:bold}
+.case-layout{display:grid;grid-template-columns:210px 1fr;gap:22px;align-items:stretch}
+.person{background:#f1f7f5;border-radius:20px;padding:17px;text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.person svg{width:145px;height:155px}
+.person h3{margin:8px 0 3px;color:var(--navy)}
+.person small{color:var(--muted)}
+.case{border:1px solid var(--border);border-radius:20px;padding:23px}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.tag{background:#e9f3f1;color:var(--teal-dark);padding:7px 11px;border-radius:30px;font-size:12px;font-weight:bold}
+.tag.orange{background:#fff0df;color:#985a1e}
+.case h2{font-size:24px;margin:0 0 12px}
+.scenario{font-size:16px;margin:0 0 17px}
+.med-box{background:#f8f7f1;border-left:4px solid var(--orange);border-radius:9px;padding:13px 15px;margin:15px 0}
+.med-box strong{display:block;color:var(--navy);margin-bottom:5px}
+.med-box span{font-size:14px;line-height:1.5}
+.question{font-weight:bold;color:var(--navy);margin:20px 0 12px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice{padding:16px;border-radius:13px;border:2px solid var(--border);background:white;font-weight:bold;color:var(--navy);transition:.2s}
+.choice:hover{border-color:var(--teal);background:#f1f9f7}
+.choice.admin{border-color:#b9ddce}
+.choice.verify{border-color:#f1d2a9}
+.feedback{display:none;margin-top:18px;padding:18px;border-radius:14px;line-height:1.55}
+.feedback.show{display:block}
+.feedback.correct{background:#e8f5ee;border:1px solid #b8ddc7}
+.feedback.incorrect{background:#fff1e8;border:1px solid #f0c5a6}
+.feedback h3{margin:0 0 7px;font-size:17px}
+.feedback p{margin:7px 0;font-size:14px}
+.feedback .learning{font-weight:bold;color:var(--navy)}
+.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+.note{font-size:12px;color:var(--muted);background:#f5f6f5;padding:14px 16px;border-radius:12px;margin-top:22px;line-height:1.5}
+.finish{text-align:center;padding:30px 15px}
+.score-circle{width:145px;height:145px;border-radius:50%;margin:20px auto;background:#e8f5f0;display:grid;place-items:center;color:var(--teal-dark);font-size:38px;font-weight:bold;border:8px solid #c5e6d9}
+.summary{max-width:620px;margin:20px auto;background:#f5f7f5;padding:18px;border-radius:15px;text-align:left}
+footer{padding:15px 30px;background:#f5f7f5;color:var(--muted);font-size:11px;display:flex;justify-content:space-between;gap:10px}
+@media(max-width:700px){
+.intro,.case-layout{grid-template-columns:1fr}
+.rules{grid-template-columns:1fr}
+.person{min-height:180px}
+.person svg{height:120px}
+header{padding:18px}
+main{padding:20px}
+.header-tag{display:none}
+h2{font-size:25px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">
+    <div class="logo">+</div>
+    <div>
+      <h1>OSMO SAFE</h1>
+      <p>Seguridad farmacológica en personas con ostomías</p>
+    </div>
+  </div>
+  <div class="header-tag">RETO DE SEGURIDAD · ENFERMERÍA</div>
+</header>
+
+<main>
+<section class="screen active" id="start">
+  <div class="intro">
+    <div>
+      <div class="eyebrow">Aprender para cuidar mejor</div>
+      <h2>¿Administrar o verificar antes?</h2>
+      <p>En este reto acompañarás a diferentes personas con ileostomía o colostomía. Tu misión será reconocer cuándo una presentación farmacéutica requiere una verificación adicional antes de continuar con el proceso de administración.</p>
+      <button class="primary" onclick="startGame()">Iniciar reto →</button>
+    </div>
+    <div class="character-large">
+      <svg viewBox="0 0 200 200" role="img" aria-label="Personaje ilustrado">
+        <circle cx="100" cy="91" r="53" fill="#d99a72"/>
+        <path d="M48 83 Q43 25 103 28 Q159 27 154 88 Q139 53 105 53 Q70 53 48 83" fill="#263746"/>
+        <circle cx="81" cy="94" r="5" fill="#263746"/>
+        <circle cx="119" cy="94" r="5" fill="#263746"/>
+        <path d="M85 116 Q100 128 116 116" stroke="#8d4e3e" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <path d="M53 160 Q100 128 147 160 L163 200 L37 200Z" fill="#168b8a"/>
+        <path d="M79 144 L100 164 L121 144" fill="#fff"/>
+        <circle cx="145" cy="46" r="18" fill="#f2a65a"/>
+        <path d="M137 46 L143 52 L154 39" stroke="#17324d" stroke-width="4" fill="none"/>
+      </svg>
+    </div>
+  </div>
+  <div class="rules">
+    <div class="rule"><strong>01 · Analiza</strong>Identifica la ostomía, el medicamento y su presentación.</div>
+    <div class="rule"><strong>02 · Decide</strong>Selecciona Administrar o Verificar antes.</div>
+    <div class="rule"><strong>03 · Aprende</strong>Revisa la explicación y el fundamento farmacológico.</div>
+  </div>
+  <div class="note">
+    <strong>Regla de seguridad:</strong> este juego no autoriza a modificar, triturar, abrir o suspender medicamentos. Ante dudas sobre la absorción o la presentación, se debe pausar y consultar a enfermería profesional, farmacia o al prescriptor, según el protocolo institucional.
+  </div>
+</section>
+
+<section class="screen" id="game">
+  <div class="topline">
+    <span class="eyebrow">Reto de situaciones clínicas</span>
+    <span class="counter" id="counter">Situación 1 de 12</span>
+  </div>
+  <div class="progress-wrap"><div class="progress" id="progress"></div></div>
+  <div class="case-layout">
+    <aside class="person">
+      <div id="avatar"></div>
+      <h3 id="personName">María</h3>
+      <small>Persona con ostomía</small>
+    </aside>
+    <div class="case">
+      <div class="tags">
+        <span class="tag" id="ostomy">ILEOSTOMÍA</span>
+        <span class="tag orange" id="category">Presentación oral</span>
+      </div>
+      <h2 id="caseTitle"></h2>
+      <p class="scenario" id="scenario"></p>
+      <div class="med-box">
+        <strong id="medicine"></strong>
+        <span id="presentation"></span>
+      </div>
+      <div class="question">¿Qué decisión es la más segura en este momento?</div>
+      <div class="choices" id="choices">
+        <button class="choice admin" onclick="answer('administrar')">✓ Administrar</button>
+        <button class="choice verify" onclick="answer('verificar')">! Verificar antes</button>
+      </div>
+      <div class="feedback" id="feedback">
+        <h3 id="feedbackTitle"></h3>
+        <p id="feedbackText"></p>
+        <p class="learning" id="learningPoint"></p>
+        <div class="actions">
+          <button class="primary" onclick="nextCase()" id="nextButton">Siguiente →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="finish">
+  <div class="finish">
+    <div class="eyebrow">Reto completado</div>
+    <h2>¡Terminaste OSMO SAFE!</h2>
+    <p>Revisa tu resultado y recuerda que la seguridad comienza al reconocer cuándo se necesita verificar.</p>
+    <div class="score-circle" id="score">0/12</div>
+    <h3 id="scoreMessage"></h3>
+    <div class="summary" id="summary"></div>
+    <button class="primary" onclick="startGame()">Volver a jugar ↻</button>
+  </div>
+</section>
+</main>
+<footer>
+  <span>OSMO SAFE · Educación para la seguridad del paciente</span>
+  <span>Versión educativa</span>
+</footer>
+</div>
+
+<script>
+const cases = [
+{
+name:"María",gender:"f",ostomy:"ILEOSTOMÍA",category:"Analgésico",
+title:"Una tableta convencional",
+scenario:"María tiene ileostomía y cuenta con una prescripción de acetaminofén por vía oral. No presenta vómito ni dificultad para deglutir.",
+medicine:"Acetaminofén (paracetamol)",
+presentation:"Tableta convencional de liberación inmediata.",
+correct:"verificar",
+feedback:"En una ileostomía, el tránsito intestinal puede ser más rápido. Aunque el acetaminofén se absorbe principalmente en el intestino delgado, es importante confirmar que la presentación específica puede administrarse de la forma prescrita.",
+learning:"Punto clave: antes de triturar o modificar una tableta, verifica que el producto lo permita y consulta al profesional responsable. No todas las tabletas pueden triturarse."
+},
+{
+name:"Juan",gender:"m",ostomy:"ILEOSTOMÍA",category:"Analgésico opioide",
+title:"Liberación prolongada",
+scenario:"Juan tiene ileostomía. En su tratamiento aparece un analgésico de liberación prolongada. La tableta tiene una estructura diseñada para liberar el medicamento durante varias horas.",
+medicine:"Tapentadol",
+presentation:"Tableta de liberación prolongada (LP).",
+correct:"verificar",
+feedback:"En una ileostomía, el tránsito acelerado puede hacer que algunas presentaciones de liberación prolongada salgan por el estoma antes de liberar completamente el medicamento.",
+learning:"Punto clave: nunca triturar, partir ni masticar una presentación de liberación prolongada. Se debe consultar para que el equipo tratante valore una alternativa."
+},
+{
+name:"Laura",gender:"f",ostomy:"COLOSTOMÍA",category:"Analgésico",
+title:"Una presentación con recubrimiento entérico",
+scenario:"Laura tiene colostomía y tiene prescrita una tableta de ácido acetilsalicílico con recubrimiento entérico. No presenta signos de intolerancia ni dificultades para deglutir.",
+medicine:"Ácido acetilsalicílico (ASA)",
+presentation:"Tableta con recubrimiento entérico.",
+correct:"administrar",
+feedback:"En una colostomía, se conserva una mayor parte del tránsito intestinal. Esta presentación puede utilizarse de acuerdo con la prescripción y las condiciones clínicas de la persona.",
+learning:"Punto clave: una tableta con recubrimiento entérico no está automáticamente contraindicada en todas las ostomías. Se debe valorar el tipo de ostomía y la formulación."
+},
+{
+name:"Carlos",gender:"m",ostomy:"ILEOSTOMÍA",category:"Analgésico",
+title:"Una alternativa efervescente",
+scenario:"Carlos tiene ileostomía. Tiene prescrita una presentación efervescente de ácido acetilsalicílico. La orden corresponde a esa presentación específica.",
+medicine:"Ácido acetilsalicílico (ASA)",
+presentation:"Tableta efervescente para disolver antes de ingerir.",
+correct:"administrar",
+feedback:"La presentación efervescente se disuelve antes de ingresar al tubo digestivo. Así, no depende de que una cubierta entérica se abra durante el tránsito intestinal.",
+learning:"Punto clave: identifica la presentación exacta. No sustituyas una presentación por otra sin una orden o autorización correspondiente."
+},
+{
+name:"Ana",gender:"f",ostomy:"ILEOSTOMÍA",category:"Antidiarreico",
+title:"Control del débito",
+scenario:"Ana tiene ileostomía y presenta aumento del débito. Tiene prescrita loperamida por vía oral. Se verifica que la presentación coincide con la orden.",
+medicine:"Loperamida",
+presentation:"Cápsula de liberación inmediata.",
+correct:"administrar",
+feedback:"La loperamida disminuye la motilidad intestinal y puede ser útil para controlar el débito de una ileostomía cuando está prescrita. Se debe vigilar la evolución del débito y los signos de deshidratación.",
+learning:"Punto clave: administra únicamente según la prescripción y observa cambios en el débito del estoma. No modifiques la presentación por cuenta propia."
+},
+{
+name:"Pepito",gender:"m",ostomy:"ILEOSTOMÍA",category:"Antiemético",
+title:"Un medicamento que acelera el tránsito",
+scenario:"Pepito tiene ileostomía y presenta náuseas. Tiene prescrita metoclopramida de liberación prolongada. El débito del estoma ha aumentado durante las últimas horas.",
+medicine:"Metoclopramida",
+presentation:"Tableta de liberación prolongada.",
+correct:"verificar",
+feedback:"La metoclopramida aumenta la motilidad gastrointestinal. En una persona con ileostomía, este efecto puede incrementar la frecuencia o la liquidez del efluente. Además, la presentación de liberación prolongada requiere revisión por el tránsito acelerado.",
+learning:"Punto clave: verifica tanto la forma farmacéutica como el efecto del medicamento sobre la motilidad intestinal."
+},
+{
+name:"Sofía",gender:"f",ostomy:"ILEOSTOMÍA",category:"Protector gástrico",
+title:"Un inhibidor de bomba de protones",
+scenario:"Sofía tiene ileostomía y tiene prescrita una tableta de pantoprazol con recubrimiento entérico. No se observa tránsito excesivamente acelerado ni restos intactos del medicamento en la bolsa.",
+medicine:"Pantoprazol",
+presentation:"Tableta con recubrimiento entérico.",
+correct:"administrar",
+feedback:"El recubrimiento entérico del pantoprazol protege el medicamento del ácido gástrico y permite su liberación en el intestino delgado. Puede utilizarse en ileostomía cuando el tránsito permite su disolución y absorción.",
+learning:"Punto clave: no todos los medicamentos con recubrimiento entérico fallan en ileostomía. La absorción depende del sitio de liberación y del tránsito intestinal."
+},
+{
+name:"Andrés",gender:"m",ostomy:"ILEOSTOMÍA",category:"Laxante",
+title:"Un medicamento de acción colónica",
+scenario:"Andrés tiene ileostomía. En la hoja de tratamiento aparece bisacodilo en tabletas con recubrimiento entérico.",
+medicine:"Bisacodilo",
+presentation:"Tableta con recubrimiento entérico.",
+correct:"verificar",
+feedback:"El bisacodilo actúa principalmente en el colon. En una persona con ileostomía, la ausencia del colon modifica el sitio de acción esperado y hace necesario revisar la indicación.",
+learning:"Punto clave: los medicamentos cuya acción depende del colon requieren especial revisión en personas con ileostomía."
+},
+{
+name:"Camila",gender:"f",ostomy:"ILEOSTOMÍA",category:"Antidepresivo",
+title:"Una presentación de liberación sostenida",
+scenario:"Camila tiene ileostomía y tiene prescrita una tableta de bupropión de liberación sostenida. La presentación indica que libera el medicamento durante un periodo prolongado.",
+medicine:"Bupropión",
+presentation:"Tableta de liberación sostenida.",
+correct:"verificar",
+feedback:"En la ileostomía, el tránsito acelerado puede dificultar la liberación y absorción completa de algunas presentaciones de liberación sostenida. También puede observarse la estructura de la tableta en la bolsa.",
+learning:"Punto clave: ante una presentación de liberación sostenida, consulta al equipo tratante. Nunca la tritures ni la partas por cuenta propia."
+},
+{
+name:"Daniel",gender:"m",ostomy:"ILEOSTOMÍA",category:"Sistema osmótico",
+title:"Una tableta con sistema OROS",
+scenario:"Daniel tiene ileostomía y en su tratamiento aparece un medicamento en una tableta con sistema osmótico oral (OROS). La cubierta es rígida y no se desintegra como una tableta convencional.",
+medicine:"Medicamento con sistema OROS",
+presentation:"Tableta de liberación controlada mediante sistema osmótico.",
+correct:"verificar",
+feedback:"Los sistemas OROS liberan el medicamento de manera controlada mediante una estructura que puede permanecer intacta. En ileostomía, el tránsito acelerado puede impedir que se complete la liberación. Si existe estrechez del estoma, también debe valorarse el riesgo de obstrucción.",
+learning:"Punto clave: identifica las presentaciones con sistemas osmóticos y consulta antes de continuar. Nunca tritures ni partas estas tabletas."
+},
+{
+name:"Valentina",gender:"f",ostomy:"COLOSTOMÍA",category:"Antiemético",
+title:"Una presentación convencional",
+scenario:"Valentina tiene colostomía y tiene prescrita una tableta convencional de ondansetrón. Puede deglutir sin dificultad y no hay cambios recientes en su estado clínico.",
+medicine:"Ondansetrón",
+presentation:"Tableta convencional de liberación inmediata.",
+correct:"administrar",
+feedback:"El ondansetrón se absorbe en las porciones altas del tubo digestivo. La presencia de una colostomía no representa por sí sola una barrera para su absorción.",
+learning:"Punto clave: una ostomía no implica que todos los medicamentos orales deban evitarse. Revisa la prescripción, la presentación y las condiciones clínicas."
+},
+{
+name:"Mateo",gender:"m",ostomy:"ILEOSTOMÍA",category:"Protector gástrico",
+title:"Gránulos con recubrimiento entérico",
+scenario:"Mateo tiene ileostomía y recibe omeprazol en cápsula que contiene gránulos con recubrimiento entérico. Refiere que en ocasiones observa restos de medicamentos en la bolsa.",
+medicine:"Omeprazol",
+presentation:"Cápsula con gránulos de recubrimiento entérico.",
+correct:"verificar",
+feedback:"Los gránulos con recubrimiento entérico pueden liberar el omeprazol en el intestino delgado. Sin embargo, si se observan restos intactos en la bolsa o hay tránsito muy acelerado, es necesario revisar la presentación y consultar una alternativa.",
+learning:"Punto clave: no tritures ni mastiques los gránulos. La posibilidad de abrir la cápsula depende de la ficha técnica del producto específico y debe ser verificada por el equipo responsable."
+}
+];
+
+let order=[],current=0,score=0,answered=false;
+
+function character(gender){
+  // Se utilizan dos ilustraciones base claramente diferenciadas.
+  // El campo gender de cada caso determina cuál se muestra.
+  if(gender === "f"){
+    return `<svg viewBox="0 0 160 170" role="img" aria-label="Avatar femenino">
+      <!-- Cabello largo detrás del rostro -->
+      <path d="M35 72 Q24 22 79 15 Q137 18 126 78 L132 145 Q111 159 105 119 L53 119 Q49 151 28 143Z" fill="#513b36"/>
+      <!-- Cuerpo y uniforme -->
+      <path d="M18 170 Q22 116 80 116 Q138 116 142 170Z" fill="#e99a63"/>
+      <path d="M54 120 L80 146 L106 120 L117 170 L43 170Z" fill="#fff"/>
+      <path d="M69 111 L80 126 L91 111" fill="#c98765"/>
+      <rect x="67" y="98" width="26" height="27" rx="10" fill="#c98765"/>
+      <!-- Rostro -->
+      <ellipse cx="80" cy="68" rx="37" ry="45" fill="#d99a72"/>
+      <path d="M43 63 Q38 19 82 19 Q124 20 118 65 Q107 45 91 42 Q67 51 43 63Z" fill="#513b36"/>
+      <path d="M44 64 Q40 93 49 111" stroke="#513b36" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <path d="M116 62 Q121 91 111 111" stroke="#513b36" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <circle cx="66" cy="70" r="3.8" fill="#263746"/>
+      <circle cx="94" cy="70" r="3.8" fill="#263746"/>
+      <path d="M70 89 Q80 97 90 89" stroke="#8d4e3e" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="42" cy="91" r="4" fill="#f2a65a"/>
+      <circle cx="118" cy="91" r="4" fill="#f2a65a"/>
+    </svg>`;
+  }
+
+  return `<svg viewBox="0 0 160 170" role="img" aria-label="Avatar masculino">
+    <!-- Cuerpo y uniforme -->
+    <path d="M17 170 Q23 115 80 115 Q137 115 143 170Z" fill="#168b8a"/>
+    <path d="M56 119 L80 143 L104 119 L116 170 L44 170Z" fill="#fff"/>
+    <path d="M68 111 L80 127 L92 111" fill="#b97858"/>
+    <rect x="67" y="96" width="26" height="28" rx="9" fill="#b97858"/>
+    <!-- Orejas y rostro -->
+    <circle cx="41" cy="69" r="8" fill="#b97858"/>
+    <circle cx="119" cy="69" r="8" fill="#b97858"/>
+    <ellipse cx="80" cy="68" rx="38" ry="45" fill="#c98765"/>
+    <!-- Cabello corto -->
+    <path d="M42 62 Q35 20 79 18 Q122 17 119 61 Q105 45 91 43 Q68 49 42 62Z" fill="#263746"/>
+    <path d="M44 48 Q57 22 84 24 Q105 24 116 43" stroke="#263746" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <!-- Cejas, ojos y barba -->
+    <path d="M59 61 L72 59 M88 59 L101 61" stroke="#263746" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="66" cy="70" r="3.8" fill="#263746"/>
+    <circle cx="94" cy="70" r="3.8" fill="#263746"/>
+    <path d="M62 91 Q80 105 98 91 Q95 112 80 113 Q65 111 62 91Z" fill="#263746"/>
+    <path d="M72 94 Q80 98 88 94" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+  </svg>`;
+}
+function startGame(){
+ order=cases.map((_,i)=>i);
+ for(let i=order.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [order[i],order[j]]=[order[j],order[i]];
+ }
+ current=0;score=0;show("game");renderCase();
+}
+function show(id){
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ document.getElementById(id).classList.add("active");
+}
+function renderCase(){
+ answered=false;
+ const c=cases[order[current]];
+ document.getElementById("counter").textContent=`Situación ${current+1} de ${order.length}`;
+ document.getElementById("progress").style.width=`${current/order.length*100}%`;
+ document.getElementById("avatar").innerHTML=character(c.gender);
+ document.getElementById("personName").textContent=c.name;
+ document.getElementById("ostomy").textContent=c.ostomy;
+ document.getElementById("category").textContent=c.category;
+ document.getElementById("caseTitle").textContent=c.title;
+ document.getElementById("scenario").textContent=c.scenario;
+ document.getElementById("medicine").textContent=c.medicine;
+ document.getElementById("presentation").textContent=c.presentation;
+ document.getElementById("choices").style.display="grid";
+ document.getElementById("feedback").className="feedback";
+ document.getElementById("nextButton").textContent=current===order.length-1?"Ver resultado →":"Siguiente →";
+}
+function answer(choice){
+ if(answered)return;
+ answered=true;
+ const c=cases[order[current]];
+ const correct=choice===c.correct;
+ if(correct)score++;
+ document.getElementById("choices").style.display="none";
+ const box=document.getElementById("feedback");
+ box.className="feedback show "+(correct?"correct":"incorrect");
+ document.getElementById("feedbackTitle").textContent=correct?"¡Decisión correcta!":"Revisa esta decisión";
+ document.getElementById("feedbackText").textContent=c.feedback;
+ document.getElementById("learningPoint").textContent=c.learning;
+ document.getElementById("progress").style.width=`${(current+1)/order.length*100}%`;
+}
+function nextCase(){
+ if(!answered)return;
+ current++;
+ if(current<order.length)renderCase();
+ else finish();
+}
+function finish(){
+ show("finish");
+ document.getElementById("score").textContent=`${score}/${order.length}`;
+ let msg=score>=10?"¡Excelente criterio de seguridad!":
+ score>=7?"Buen trabajo. Refuerza los casos que requieren verificación.":
+ "Sigue practicando: reconocer una duda también es una acción segura.";
+ document.getElementById("scoreMessage").textContent=msg;
+ document.getElementById("summary").innerHTML=
+ `<strong>Tu resultado:</strong> ${score} respuestas correctas de ${order.length}.<br><br>
+ <strong>Recuerda:</strong> la ileostomía puede modificar el tránsito y la absorción de algunas presentaciones. La colostomía suele conservar un patrón de absorción más cercano al habitual. Sin embargo, la decisión depende del medicamento, su formulación y la situación clínica.`;
+}
+</script>
+</body>
+</html>
